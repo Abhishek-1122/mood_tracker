@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.png"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+        crossorigin="anonymous">
+
+  <title>Mood Tracker</title>
+ <style>
+  .btn-outline-info{
+   background-color: #0079FF;
+  }
+ </style>
+</head>
+<body>
+
+  <!-- Navbar Goes Here -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+    <div class="container">  
+      <a class="navbar-brand" href="#">Mood Tracker</a>
+      </div>
+  </nav><br><br>
+  
+
+  <!-- Dashboard Start Here -->
+  <div id="content" class="container" >
+    
+    <div class="jumbotron  text-white" style="background-color: #0079FF;">
+      <h1 class="display-4">Hello </h1>
+      <hr class="my-4">
+      <p class="lead">Welcome to your daily mood tracker. How do you feel today?</p>
+     
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        today is: <h4 id="activeDate">31 December 2019</h4>
+      </div>
+    </div>
+
+    <div class="row">
+
+
+      <div class="right-section col-lg-12">
+        <br>
+        <section name="journal">
+          <div class="card">
+            <div class="card-header"><b>Journal</b></div>
+            <div id='journal-card' class="card-body">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Mood</th>
+                    <th>Cause</th>
+                    
+                    <th>Content</th>
+                  </tr>
+                </thead>
+                <tbody id="journal-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <a href="#" class="back-to-top"><i class="lni-chevron-up"></i></a>
+          <div id="journalCard" class="collapse">
+            <br>
+            <div class="card">
+              <div class="card-body">
+                <b>New Journal:</b> <span id="newjournal-inputDate"></span>
+                <hr>
+                <form id="form-newJournal" >
+                  <div class="form-group">
+                    <label for="input-mood">Select Emotion</label>
+                    <select class="form-control" id="input-mood">
+                      <option value="">Select an emotion</option>
+                      <option value="Happy">Happy</option>
+                      <option value="Sad">Sad</option>
+                      <option value="Angry">Angry</option>
+                      <option value="Excited">Excited</option>
+                      <!-- Add more options for other emotions -->
+                    </select>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="input-cause">Specify Cause</label>
+                    <input required autocomplete="off" type="text" class="form-control" id="input-cause" placeholder="">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="input-journal">Write Something Here</label>
+                    <textarea required class="form-control" id="input-journal" rows="3"></textarea>
+                  </div>
+                  <input type="hidden" id="input-mood" value="">
+                  <button id="btn-submit-newJournal" type="submit" class="btn btn-lg btn-block" style="background-color: #0079FF; color: white;">Add new journal
+                    entry</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <br>
+          <button type="btn-addJournal" class="btn btn-block btn-lg btn-outline-info" style="background-color: #0079FF; color: white;" data-toggle="collapse"
+            data-target="#journalCard">Write a Journal</button>
+          <br>
+          <button id="download-data-btn" class="btn  btn-block" style="background-color: #0079FF;color: white; " >Download Data</button>
+        </section>
+
+        <script>
+          // Add new journal entry
+          // Add new journal entry
+document.getElementById('form-newJournal').addEventListener('submit', function (event) {
+  event.preventDefault();
+
+  // Get the current date and time
+  var currentDate = new Date();
+  var formattedDate = currentDate.getDate() + '/' + (currentDate.getMonth() + 1) + '/' + currentDate.getFullYear();
+  var formattedTime = currentDate.getHours() + ':' + currentDate.getMinutes();
+
+  // Get the input values
+
+  var content = document.getElementById('input-journal').value;
+  var mood = document.getElementById('input-mood').value;
+  var cause = document.getElementById('input-cause').value;
+  // Validate if mood is selected
+  if (!mood) {
+    alert('Please select a mood.');
+    return;
+  }
+
+    // Create a new journal entry HTML table row
+      var journalEntry = document.createElement('tr');
+      journalEntry.innerHTML = `
+        <td>${formattedDate}</td>
+        <td>${formattedTime}</td>
+        <td>${mood}</td>
+        <td>${cause}</td>
+        
+        <td>${content}</td>
+      `;
+
+      // Add the journal entry to the journal-table tbody
+      var journalTableBody = document.getElementById('journal-table-body');
+      journalTableBody.appendChild(journalEntry);
+
+  // Reset the input fields
+ 
+  document.getElementById('input-journal').value = '';
+  document.getElementById('input-mood').value = '';
+  document.getElementById('input-cause').value = '';
+  // Collapse the journalCard div after adding the entry
+  document.getElementById('journalCard').classList.remove('show');
+});
+
+
+          // Select mood
+          function selectMood(mood) {
+            document.getElementById('input-mood').value = mood;
+          }
+
+          // Download data as PDF
+          document.getElementById('download-data-btn').addEventListener('click', function () {
+            var journalCard = document.getElementById('journal-card');
+
+            // Create a new HTML2PDF instance
+            var element = document.getElementById('journal-card');
+            var opt = {
+              margin: 1,
+              filename: 'journal.pdf',
+              image: { type: 'jpeg', quality: 0.98 },
+              html2canvas: { scale: 2 },
+              jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            // Generate and download the PDF
+            html2pdf().set(opt).from(element).save();
+          });
+        </script>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7fRZM2K6zFsjvxh/8j+HMH0s6lIE4KAfF8Fe/4Z1mOMf0F5f2"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHtM38MOrZ3G/8LJoWzacJi5tu7wnz1Yu2pJAU5/paFwGjTGXbN7J27j/3"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6hSfZn5VfE+IbbVsj/00mDzR95+AYoP7b"
+    crossorigin="anonymous"></script>
+        </script>
+        
+
+
+      </div>
+    
+    </div>
+    <br>
+    
+    <!-- this need to be generated from js -->
+
+  </div>
+  <script>
+    // Get the current date
+    var currentDate = new Date();
+    
+    // Format the date as 'dd/mm'
+    var formattedDate = currentDate.getDate() + '/' + (currentDate.getMonth() + 1);
+    
+    // Update the span text
+    document.getElementById('newjournal-inputDate').textContent = formattedDate;
+  </script>
+  
+ <!--====== FOOTER PART START ======-->
+ 
+ <footer id="footer" class="footer-area pt-120">
+   <div>  <center> <p>Made with ❤️ by Team <span ><strong>Expecto-Winno</strong> </span>.</p></center></div>
+         
+       
+                
+    
+</footer>
+
+<!--====== FOOTER PART ENDS ======-->
+</body>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="main.js"></script>
+</html>
